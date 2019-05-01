@@ -23,5 +23,5 @@ if __name__ == "__main__":
         final_hash = proof_of_work(nonce)
 
     end = timer()
-    print(final_hash)
-    print(timedelta(seconds=end-start))
+    print('Final Hash:', final_hash)
+    print('Time elapsed:', timedelta(seconds=end-start))
