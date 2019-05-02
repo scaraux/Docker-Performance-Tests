@@ -1,0 +1,85 @@
+<div class="background-img-mybet">
+  <div class="flex-column header">
+    <span class="text-yellow" style="font-size: 24px">PARTAGE TON PRONOS AVEC LA COMMUNAUTÉ NYL2 PRONOS</span>
+    <span class="text-italic text-white" style="font-size: 14px">
+    Chaque jour, nous regarderons avec attention les pronostics partagés et
+    nous sélectionnerons un ou plusieurs pronos pour les poster sur notre application et notre site avec TON pseudo !
+  </span>
+  </div>
+</div>
+
+<div class="background-grey content flex-column">
+  <div class="add-container">
+    <div class="left-container">&nbsp;</div>
+    <div class="right-container">
+      <div class="input-container" style="width: 50%">
+        <p class="label">MON PSEUDO</p>
+        <input class="input-user" [(ngModel)]="pseudo">
+      </div>
+      <div *ngFor="let prono of pronos;let idxProno = index">
+        <div class="choose-sport">
+          <p class="label">CHOISI TON SPORT</p>
+          <div class="flex-row">
+            <div *ngFor="let sport of sportTypes" class="no-padding sport-btn">
+              <div class="btn-sport mouse-click" (click)="changeSport(idxProno, sport)"
+                   [ngClass]="sport?.name == prono.sport?.name? 'background-yellow': 'background-white'">
+                <img *ngIf="sport.logo" class="sport-logo" [src]="sport.logo">
+                <p class="sport-name">{{sport.name}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="match-description" *ngFor="let match of prono.matchs;let idxMatch = index;">
+          <div class="flex-row row-description">
+            <div class="input-container" style="width: 50%">
+              <p class="label">MATCH</p>
+              <input class="input-user" [(ngModel)]="match.match">
+            </div>
+            <div class="input-container" style="width: 50%">
+              <div class="flex-row justify-content-between">
+                <p class="label">INTITULE DU PARI</p>
+                <ng-template #popContent>
+                  <div class="flex-row">
+                    <p class="text-popover mouse-click text-white" (click)="removeMatch(idxProno, idxMatch)">OUI</p>
+                    <p class="text-popover mouse-click text-white border-left-white" (click)="p.close()">NON</p>
+                  </div>
+                </ng-template>
+                <ng-template #popTitle>
+                  SUPPRIMER CE MATCH
+                </ng-template>
+                <div class="background-blue circle" [ngbPopover]="popContent" [popoverTitle]="popTitle"
+                     popoverClass="popover-delete" triggers="manual" placement="bottom" #p="ngbPopover"
+                     *ngIf="idxMatch + 1 < prono.matchs.length" (click)="p.open()">
+                  <p>X</p>
+                </div>
+              </div>
+              <input class="input-user" [(ngModel)]="match.name">
+            </div>
+          </div>
+          <div class="flex-row row-cote">
+            <div class="input-container" style="width: 20%">
+              <p class="label">COTE</p>
+              <input class="input-user" type="number" step="0.1" [(ngModel)]="match.cote">
+            </div>
+            <div class="background-yellow button-add-match mouse-click" (click)="addMatch(idxProno)" *ngIf="idxMatch + 1 == prono.matchs.length">
+              <span class="roboto-medium">Partager un autre match</span>
+            </div>
+            <div class="background-blue button-add-sport text-white mouse-click" (click)="addSport()" *ngIf="idxMatch + 1 == prono.matchs.length">
+              <span class="roboto-medium">Partager un match d’un autre sport</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex-column row-analyze">
+          <p class="label label-analyze">ANALYSE</p>
+          <p>Écris ton analyse, tes commentaires sur le ou les match(s) que tu souhaites partager à la communauté</p>
+          <textarea rows="4" class="textarea-analyze" [(ngModel)]="prono.analyze"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-mybet flex-row justify-content-center">
+    <button class="background-yellow btn-send mouse-click" [disabled]="isLoading"  (click)="sendMyBet()" [ladda]="isLoading">
+      <span class="roboto-medium">ENVOYER</span>
+    </button>
+  </div>
+</div>
