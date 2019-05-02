@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "PorterStemmer2",
+        "repositoryURL": "https://github.com/scaraux/Swift-Porter-Stemmer-2",
+        "state": {
+          "branch": null,
+          "revision": "9a8055c8dfd8301eaa9104ba0c939f37847dbeb0",
+          "version": "0.1.1"
+        }
+      },
+      {
+        "package": "SwiftPriorityQueue",
+        "repositoryURL": "https://github.com/davecom/SwiftPriorityQueue",
+        "state": {
+          "branch": null,
+          "revision": "9e132c74cb337542ef05e99e0c2dbf345b6527a3",
+          "version": "1.3.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
