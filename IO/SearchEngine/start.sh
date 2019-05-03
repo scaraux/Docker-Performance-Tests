@@ -1,0 +1,1 @@
+swift build -c release -Xswiftc -O -Xswiftc -whole-module-optimization
