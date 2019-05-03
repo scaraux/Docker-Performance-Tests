@@ -1,6 +1,17 @@
 
 import Foundation
 
+extension Dictionary {
+    var jsonStringRepresentation: String? {
+        guard let theJSONData = try? JSONSerialization.data(withJSONObject: self,
+                                                            options: [.prettyPrinted]) else {
+            return nil
+        }
+
+        return String(data: theJSONData, encoding: .ascii)
+    }
+}
+
 class Controller: EngineDelegate, CreateEnvironmentDelegate, LoadEnvironmentDelegate {
 
     var startIndexingDP: DispatchTime?
@@ -54,18 +65,14 @@ class Controller: EngineDelegate, CreateEnvironmentDelegate, LoadEnvironmentDele
             "average_query_response_time" : averageQueryTime,
         ]
 
-        if let json = JSONStringEncoder().encode(measurements) {
-            do {
-                let timestamp = generateCurrentTimeStamp()
-                let path = URL(fileURLWithPath: "./Measures/measure-\(timestamp).json", isDirectory: true)
-                try json.write(to: path, atomically: true, encoding: .utf8)
-            }
-            catch {
-                print("Could not generate JSON")
-            }
-        } else {
-            print("Error creating JSON")
+        do {
+            let timestamp = generateCurrentTimeStamp()
+            let path = URL(fileURLWithPath: "./Measures/measure-\(timestamp).json", isDirectory: true)
+            try measurements.jsonStringRepresentation!.write(to: path, atomically: true, encoding: .utf8)
+        } catch {
+            print("Could not generate JSON")
         }
+
         exit(0)
     }
 
@@ -153,7 +160,7 @@ class Controller: EngineDelegate, CreateEnvironmentDelegate, LoadEnvironmentDele
     }
 }
 
-let path = URL(fileURLWithPath: "./Corpus/3000NationalParks/", isDirectory: true)
+let path = URL(fileURLWithPath: "./Corpus/Full_NationalParks/", isDirectory: true)
 let controller = Controller(atPath: path)
 
 let queries = [
