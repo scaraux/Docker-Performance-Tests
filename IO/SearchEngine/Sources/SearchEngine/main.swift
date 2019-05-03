@@ -155,7 +155,7 @@ class Controller: EngineDelegate, CreateEnvironmentDelegate, LoadEnvironmentDele
 
     func generateCurrentTimeStamp() -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MM_dd_hh_mm_ss"
+        formatter.dateFormat = "MM-dd-YYYY-hh-mm-ss"
         return (formatter.string(from: Date()) as NSString) as String
     }
 }
