@@ -9,12 +9,12 @@
 import Foundation
 
 class WritingDiskEnvUtility<T: FixedWidthInteger, U: FixedWidthInteger>: DiskEnvUtility<T, U> {
-    
+
     /// Mapping for types [type -> {offset + length}]
     public var typesMappings: [String: VocabularyMappingEntry]?
     /// Mapping for stems (vocab) [stem -> {offset + length}]
     public var stemsMappings: [String: VocabularyMappingEntry]?
-    
+
     /// Write entire index to disk files, including file names,
     /// postings and positions
     ///
@@ -33,7 +33,7 @@ class WritingDiskEnvUtility<T: FixedWidthInteger, U: FixedWidthInteger>: DiskEnv
         // Write pairs of offsets, for each term and its postings, in table binary file
         writeTable(vocabularyOffsets, postingsOffsets)
     }
-    
+
     public func writeKGramIndex(index gramIndex: GramIndexProtocol) {
         // Retrieve index
         guard let index = gramIndex as? GramIndex else {
@@ -44,7 +44,7 @@ class WritingDiskEnvUtility<T: FixedWidthInteger, U: FixedWidthInteger>: DiskEnv
             writeGram(gram: entry.key, elements: entry.value)
         }
     }
-    
+
     /// Write weights for given documents. Documents are sorted in ascending
     /// order by their id. Therefore the offset corresponds to the document id.
     ///
@@ -63,7 +63,7 @@ class WritingDiskEnvUtility<T: FixedWidthInteger, U: FixedWidthInteger>: DiskEnv
         // Write the entire object
         self.weightsFile.write(data: data)
     }
-    
+
     private func getBinaryRepresentation(forPostings postings: [Posting]) -> Data {
         // A Data object that will be written on file
         var data = Data()
@@ -102,7 +102,7 @@ class WritingDiskEnvUtility<T: FixedWidthInteger, U: FixedWidthInteger>: DiskEnv
         // Return data
         return data
     }
-    
+
     private func writePostings(_ vocabulary: [String], _ index: IndexProtocol) -> [UInt64] {
         // Iterate over all terms in vocabulary
         for i in 0..<vocabulary.count {
@@ -119,7 +119,7 @@ class WritingDiskEnvUtility<T: FixedWidthInteger, U: FixedWidthInteger>: DiskEnv
         }
         return self.postingsFile.offsets
     }
-    
+
     private func writeVocabulary(_ vocabulary: [String]) -> [UInt64] {
         // Initialize a Vocabulary Mapping Entry dictionary
         var mappings: [String: VocabularyMappingEntry] = [:]
@@ -145,20 +145,20 @@ class WritingDiskEnvUtility<T: FixedWidthInteger, U: FixedWidthInteger>: DiskEnv
         // Return offsets
         return self.vocabularyFile.offsets
     }
-    
+
     private func writeTable(_ vocabularyOffsets: [UInt64], _ postingsOffsets: [UInt64]) {
         for i in 0..<vocabularyOffsets.count {
             var termOffset: UInt64 = vocabularyOffsets[i]
             let termOffsetData: Data =  Data(bytes: &termOffset, count: MemoryLayout<UInt64>.size)
-            
+
             var postingOffset: UInt64 = postingsOffsets[i]
             let postingOffsetData: Data =  Data(bytes: &postingOffset, count: MemoryLayout<UInt64>.size)
-            
+
             self.tableFile.write(data: termOffsetData)
             self.tableFile.write(data: postingOffsetData)
         }
     }
-    
+
     private func writeTypes(elements: Set<VocabularyElement>) {
         // Initialize a Vocabulary Mapping Entry dictionary
         var mappings: [String: VocabularyMappingEntry] = [:]
@@ -182,7 +182,7 @@ class WritingDiskEnvUtility<T: FixedWidthInteger, U: FixedWidthInteger>: DiskEnv
         // Set Mappings
         self.typesMappings = mappings
     }
-    
+
     private func getDataForVocabularyElement(element: VocabularyElement) -> Data {
         // Create data object
         var data: Data = Data()
@@ -190,22 +190,22 @@ class WritingDiskEnvUtility<T: FixedWidthInteger, U: FixedWidthInteger>: DiskEnv
         let mappingEntryForStem: VocabularyMappingEntry = stemsMappings![element.stem]!
         // Mapping entry for type
         let mappingEntryForType: VocabularyMappingEntry = typesMappings![element.type]!
-        
+
         var offsetForStem: UInt64 = mappingEntryForStem.offset
         var lengthForStem: T = T(mappingEntryForStem.dataLength)
-        
+
         var offsetForType: UInt64 = mappingEntryForType.offset
         var lengthForType: T = T(mappingEntryForType.dataLength)
 
         data.append(Data(bytes: &offsetForStem, count: MemoryLayout<UInt64>.size))
         data.append(Data(bytes: &lengthForStem, count: MemoryLayout<T>.size))
-        
+
         data.append(Data(bytes: &offsetForType, count: MemoryLayout<UInt64>.size))
         data.append(Data(bytes: &lengthForType, count: MemoryLayout<T>.size))
-        
+
         return data
     }
-    
+
     private func writeGram(gram: String, elements: Set<VocabularyElement>) {
         // A Data object that will be written on file
         var data: Data = Data()

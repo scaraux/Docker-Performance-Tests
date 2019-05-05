@@ -1,0 +1,8 @@
+{
+  "load_index_to_ram_time" : 4.3133285639999999,
+  "average_query_response_time" : 0.11344360577777778,
+  "indexing_time" : 12.22318048,
+  "generate_gram_index_time" : 3.6923797770000002,
+  "write_index_to_disk_time" : 5.6368113309999996,
+  "number_queries_executed" : 9
+}

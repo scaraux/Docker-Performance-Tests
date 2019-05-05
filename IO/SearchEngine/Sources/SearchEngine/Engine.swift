@@ -19,6 +19,8 @@ class Engine {
     weak var initDelegate: CreateEnvironmentDelegate?
     weak var loadDelegate: LoadEnvironmentDelegate?
 
+    public var totalWrites = 0
+
     /// Modes for searching documents
     ///
     /// - boolean: Boolean Retrieval
@@ -33,6 +35,14 @@ class Engine {
         self.booleanQueryParser = BooleanQueryParser()
         self.stemmer = PorterStemmer(withLanguage: .English)!
         self.tokenProcessor = AdvancedTokenProcessor()
+    }
+
+    func getTotalReads() -> Int {
+        return self.index!.getTotalReads()
+    }
+
+    func getTotalWrites() -> Int {
+        return self.totalWrites
     }
 
     /// Executes a query from a given query string
@@ -255,6 +265,8 @@ class Engine {
             utility.writeWeights(documents: documents)
             // Release the resources
             utility.dispose()
+
+            self.totalWrites = utility.getTotalWrites()
         } catch let error as NSError {
             print(error.description)
         }

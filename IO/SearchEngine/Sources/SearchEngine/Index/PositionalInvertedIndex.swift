@@ -21,13 +21,16 @@ class PositionalInvertedIndex: IndexProtocol {
         self.kGramIndex = GramIndex()
         self.elements = Set<VocabularyElement>()
     }
-    
+
     init(withIndex index: [String: [Posting]]) {
         self.map = index
         self.types = [:]
         self.kGramIndex = GramIndex()
         self.elements = Set<VocabularyElement>()
     }
+
+    func getTotalReads() -> Int { return 0 }
+    func getTotalWrites() -> Int { return 0 }
 
     private func withPostings<R>(forStem stem: String, mutations: (inout [Posting]) throws -> R) rethrows -> R {
         return try mutations(&map[stem, default: []])
@@ -36,23 +39,23 @@ class PositionalInvertedIndex: IndexProtocol {
     func getPostingsWithoutPositionsFor(stem: String) -> [Posting]? {
         return self.map[stem]
     }
-    
+
     func getPostingsWithPositionsFor(stem: String) -> [Posting]? {
         return self.map[stem]
     }
-    
+
     func getWeightForDocument(documentId: Int) -> Double? {
         return nil
     }
-    
+
     public func getKGramIndex() -> GramIndexProtocol {
         return self.kGramIndex
     }
-    
+
     public func getVocabulary() -> [String] {
         return Array(self.map.keys).sorted(by: <)
     }
-    
+
     func getElements() -> Set<VocabularyElement> {
         return self.elements
     }
@@ -65,20 +68,20 @@ class PositionalInvertedIndex: IndexProtocol {
             else {
                 let posting = Posting(withDocumentId: docId, forTerm: element.stem)
                 posting.addPosition(position)
-                postings.append(posting)                
+                postings.append(posting)
             }
         }
         self.types[element.type] = element.stem
         self.elements.insert(element)
     }
-    
+
     func dispose() {
-        
+
     }
 }
 
 extension PositionalInvertedIndex {
-    
+
     public func getQueryResultsFor(stem: String, fromTerm: String,
                                    withDummyMap map: [String: [Posting]]) -> [QueryResult]? {
         if let postings = map[stem] {

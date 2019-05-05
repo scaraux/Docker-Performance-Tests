@@ -10,7 +10,7 @@
 import Foundation
 
 extension Data {
-    
+
     mutating func readData(ofLength length: Int) -> Data {
         let data: Data = self.subdata(in: 0..<length)
         self.removeSubrange(0..<length)
@@ -22,12 +22,12 @@ class ReadingDiskEnvUtility<T: FixedWidthInteger, U: FixedWidthInteger>: DiskEnv
 
     var map: [String: Set<VocabularyElement>] = [:]
     weak var loadDelegate: LoadEnvironmentDelegate?
-    
+
     private func withTypes<R>(forGram gram: String,
                               mutations: (inout Set<VocabularyElement>) throws -> R) rethrows -> R {
         return try mutations(&map[gram, default: []])
     }
-    
+
     /// Retrieve postings that corresponds to a given term, in the
     /// disk written index. A binary search is performed on the
     /// table binary file to locate the offset of the postings in
@@ -53,13 +53,13 @@ class ReadingDiskEnvUtility<T: FixedWidthInteger, U: FixedWidthInteger>: DiskEnv
         // Return nil if term has not been found
         return nil
     }
-    
+
     public func getVocabulary() -> [String] {
         var vocabulary: [String] = []
         var tableData: Data = Data()
         var vocabData: Data = Data()
         let sizeOfOffset =  MemoryLayout<UInt64>.size
-        
+
         do {
             tableData = try Data(contentsOf: self.tableFile.url)
             vocabData = try Data(contentsOf: self.vocabularyFile.url)
@@ -70,7 +70,7 @@ class ReadingDiskEnvUtility<T: FixedWidthInteger, U: FixedWidthInteger>: DiskEnv
         var index = 0
         // Read the first offset
         var currentTermOffset: UInt64 = tableData.subdata(in: index..<index + 8).withUnsafeBytes { $0.pointee }
-        
+
         while true {
             // If last term, stop loop
             if tableData.count < index + sizeOfOffset * 2 + sizeOfOffset {
@@ -100,7 +100,7 @@ class ReadingDiskEnvUtility<T: FixedWidthInteger, U: FixedWidthInteger>: DiskEnv
         // Return vocabulary
         return vocabulary
     }
-    
+
     public func getWeightForDocument(documentId id: Int) -> Double? {
         // Calculate how many bytes needed to represent desired weight value
         let chunkSize = MemoryLayout<Double>.size
@@ -115,12 +115,12 @@ class ReadingDiskEnvUtility<T: FixedWidthInteger, U: FixedWidthInteger>: DiskEnv
         // Return weight
         return weight
     }
-    
+
     public func getGramMap() -> [String: Set<VocabularyElement>] {
         DispatchQueue.main.async {
             self.loadDelegate?.onLoadingPhaseChanged(phase: .phaseLoadingGrams, withTotalCount: 0)
         }
-        
+
         var gramFileData: Data = Data()
         var stemsFileData: Data = Data()
         var typesFileData: Data = Data()
@@ -133,7 +133,7 @@ class ReadingDiskEnvUtility<T: FixedWidthInteger, U: FixedWidthInteger>: DiskEnv
         } catch {
             return [:]
         }
-        
+
         var gramCounter = 1
         var index = 0
         // Iterate until we reach end of file
@@ -162,10 +162,10 @@ class ReadingDiskEnvUtility<T: FixedWidthInteger, U: FixedWidthInteger>: DiskEnv
                 index += 8
                 let typeLength: UInt32 = gramFileData.subdata(in: index..<index + 4).withUnsafeBytes { $0.pointee }
                 index += 4
-                
+
                 let stemData: Data = stemsFileData.subdata(in: Int(stemOffset)..<Int(stemOffset) + Int(stemLength))
                 let typeData: Data = typesFileData.subdata(in: Int(typeOffset)..<Int(typeOffset) + Int(typeLength))
-                
+
                 let stem: String = String(bytes: stemData, encoding: .utf8)!
                 let type: String = String(bytes: typeData, encoding: .utf8)!
 
@@ -186,7 +186,7 @@ class ReadingDiskEnvUtility<T: FixedWidthInteger, U: FixedWidthInteger>: DiskEnv
         }
         return self.map
     }
-    
+
     private func getPostingData(forTerm term: String, withPositions: Bool) -> Posting {
         // An Integer holding the id of a document
         let id: T = self.postingsFile.readInteger()!
@@ -228,7 +228,7 @@ class ReadingDiskEnvUtility<T: FixedWidthInteger, U: FixedWidthInteger>: DiskEnv
         // Return posting
         return posting
     }
-    
+
     private func getPostingsAtOffset(atOffset offset: UInt64, forTerm term: String, withPositions: Bool) -> [Posting] {
         // The array of postings that this function will translate form bytes
         var postings = [Posting]()
@@ -251,7 +251,7 @@ class ReadingDiskEnvUtility<T: FixedWidthInteger, U: FixedWidthInteger>: DiskEnv
         // Return the postings list
         return postings
     }
-    
+
     private func binarySearchTerm(_ target: String) -> (Bool, U) {
         // Number of bits to represent a single value
         let memorySizeOfValue = MemoryLayout<U>.size

@@ -23,7 +23,7 @@ class DiskEnvUtility<T: FixedWidthInteger, U: FixedWidthInteger> {
     public var gramFile: BinaryFile
     // The URL of the index directory
     public var url: URL
-        
+
     init(atPath url: URL,
          fileMode mode: DiskConstants.FileDescriptorMode,
          postingsEncoding: T.Type,
@@ -48,7 +48,7 @@ class DiskEnvUtility<T: FixedWidthInteger, U: FixedWidthInteger> {
         // Construct Types file URL
         let typesFileURL = url.appendingPathComponent(DiskConstants.indexDirectoryName, isDirectory: true)
             .appendingPathComponent(DiskConstants.typesDiskFileName)
-        
+
         if mode == .writing {
             self.weightsFile = try BinaryFile.createBinaryFile(atPath: weightsFileURL, for: mode)
             self.postingsFile = try BinaryFile.createBinaryFile(atPath: postingsFileURL, for: mode)
@@ -66,7 +66,25 @@ class DiskEnvUtility<T: FixedWidthInteger, U: FixedWidthInteger> {
             self.typesFile = try BinaryFile(atPath: typesFileURL, for: mode)
         }
     }
-    
+
+    public func getTotalReads() -> Int {
+        return self.weightsFile.totalReads +
+        self.postingsFile.totalReads +
+        self.vocabularyFile.totalReads +
+        self.tableFile.totalReads +
+        self.gramFile.totalReads +
+        self.typesFile.totalReads
+    }
+
+    public func getTotalWrites() -> Int {
+        return self.weightsFile.totalWrites +
+        self.postingsFile.totalWrites +
+        self.vocabularyFile.totalWrites +
+        self.tableFile.totalWrites +
+        self.gramFile.totalWrites +
+        self.typesFile.totalWrites
+    }
+
     public func dispose() {
         self.weightsFile.dispose()
         self.postingsFile.dispose()

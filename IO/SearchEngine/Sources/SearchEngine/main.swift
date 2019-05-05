@@ -23,6 +23,11 @@ class Controller: EngineDelegate, CreateEnvironmentDelegate, LoadEnvironmentDele
     var startLoadingGramsDP: DispatchTime?
     var finishLoadingGramsDP: DispatchTime?
 
+    var startQueriesDP: DispatchTime?
+    var finishQueriesDP: DispatchTime?
+
+    var totalWrites: Int = 0
+
     var path: URL!
     var queries: [String] = []
     var engine = Engine()
@@ -50,28 +55,28 @@ class Controller: EngineDelegate, CreateEnvironmentDelegate, LoadEnvironmentDele
     }
 
     func measurePerformance() {
+        let totalReads = self.engine.getTotalReads()
+
         let indexingTime = computeElapsedTime(self.startIndexingDP!, self.finishIndexingDP!)
         let generateGramTime = computeElapsedTime(self.startKGramDP!, self.finishKGramDP!)
         let writeIndexTime = computeElapsedTime(self.startWritingIndexDP!, self.finishWritingIndexDP!)
         let loadTime = computeElapsedTime(self.startLoadingGramsDP!, self.finishLoadingGramsDP!)
+        let queryTime = computeElapsedTime(self.startQueriesDP!, self.finishQueriesDP!)
         let averageQueryTime = self.queryTimeAccumulator / Double(self.queries.count)
 
         let measurements: [String: Any] = [
-            "indexing_time" : indexingTime,
-            "generate_gram_index_time" : generateGramTime,
-            "write_index_to_disk_time" : writeIndexTime,
+            "indexing_time": indexingTime,
+            "generate_gram_index_time": generateGramTime,
+            "write_index_to_disk_time": writeIndexTime,
             "load_index_to_ram_time" : loadTime,
             "number_queries_executed": self.queries.count,
             "average_query_response_time" : averageQueryTime,
+            "total_reads_during_queries": totalReads,
+            "total_writes_during_indexing": self.totalWrites,
+            "query_time": queryTime
         ]
 
-        do {
-            let timestamp = generateCurrentTimeStamp()
-            let path = URL(fileURLWithPath: "./Measures/measure-\(timestamp).json", isDirectory: true)
-            try measurements.jsonStringRepresentation!.write(to: path, atomically: true, encoding: .utf8)
-        } catch {
-            print("Could not generate JSON")
-        }
+        print(measurements.jsonStringRepresentation!)
 
         exit(0)
     }
@@ -98,9 +103,11 @@ class Controller: EngineDelegate, CreateEnvironmentDelegate, LoadEnvironmentDele
     }
 
     func onEnvironmentLoaded() {
+        self.startQueriesDP = DispatchTime.now()
         for query in self.queries {
             self.execQuery(query)
         }
+        self.finishQueriesDP = DispatchTime.now()
         self.measurePerformance()
     }
 
@@ -130,6 +137,7 @@ class Controller: EngineDelegate, CreateEnvironmentDelegate, LoadEnvironmentDele
             self.startWritingIndexDP = DispatchTime.now()
         }
         if (phase == .terminated) {
+            self.totalWrites = self.engine.getTotalWrites()
             print("4. Indexing terminated successfully.")
             self.finishWritingIndexDP = DispatchTime.now()
             self.loadEnvironment()

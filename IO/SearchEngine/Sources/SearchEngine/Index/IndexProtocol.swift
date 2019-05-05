@@ -15,5 +15,7 @@ protocol IndexProtocol {
     func getElements() -> Set<VocabularyElement>
     func getVocabulary() -> [String]
     func getKGramIndex() -> GramIndexProtocol
+    func getTotalReads() -> Int
+    func getTotalWrites() -> Int
     func dispose()
 }

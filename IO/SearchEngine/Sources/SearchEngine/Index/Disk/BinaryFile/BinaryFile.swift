@@ -15,6 +15,8 @@ class BinaryFile {
 //    private(set) var headOffset: UInt64 = 0
     private(set) var handle: FileHandle?
     private(set) var url: URL
+    public var totalReads = 0
+    public var totalWrites = 0
     private var currentOffset: UInt64 = 0
     private var buffer: Data
 
@@ -53,6 +55,7 @@ class BinaryFile {
     }
 
     public func write(data: Data) {
+        self.totalWrites += 1
         self.handle!.write(data)
         self.offsets.append(self.currentOffset)
         self.currentOffset += UInt64(data.count)
@@ -83,6 +86,7 @@ class BinaryFile {
 //    }
 
     public func read(chunkSize: Int) -> Data {
+        self.totalReads += 1
         return self.handle!.readData(ofLength: chunkSize)
     }
 

@@ -13,12 +13,20 @@ class DiskPositionalIndex<T: FixedWidthInteger, U: FixedWidthInteger>: IndexProt
     private var diskIndexUtility: ReadingDiskEnvUtility<T, U>
     /// An Index that holds all K-gram values
     private(set) var kGramIndex: GramIndex
-    
+
     init(atPath url: URL, utility: ReadingDiskEnvUtility<T, U>, gramIndex: GramIndex) {
         self.diskIndexUtility = utility
         self.kGramIndex = gramIndex
     }
- 
+
+    func getTotalReads() -> Int {
+        return self.diskIndexUtility.getTotalReads()
+    }
+
+    func getTotalWrites() -> Int {
+        return self.diskIndexUtility.getTotalWrites()
+    }
+
     /// Retrieve postings that contains a given stem
     ///
     /// - Parameter stem: Is the stemmed version of the term
@@ -26,11 +34,11 @@ class DiskPositionalIndex<T: FixedWidthInteger, U: FixedWidthInteger>: IndexProt
     func getPostingsWithoutPositionsFor(stem: String) -> [Posting]? {
         return self.diskIndexUtility.getPostings(forTerm: stem, withPositions: false)
     }
-    
+
     func getPostingsWithPositionsFor(stem: String) -> [Posting]? {
         return self.diskIndexUtility.getPostings(forTerm: stem, withPositions: true)
     }
-    
+
     /// Retrieve calculated weight for a given document
     ///
     /// - Parameter id: Is the document ID that identifies the docunent
@@ -38,14 +46,14 @@ class DiskPositionalIndex<T: FixedWidthInteger, U: FixedWidthInteger>: IndexProt
     func getWeightForDocument(documentId id: Int) -> Double? {
         return self.diskIndexUtility.getWeightForDocument(documentId: id)
     }
-    
+
     /// Returns the all terms contained by the index
     ///
     /// - Returns: A list of terms, as strings
     func getVocabulary() -> [String] {
         return self.diskIndexUtility.getVocabulary()
     }
-    
+
     /// Returns the K-Gram index
     ///
     /// - Returns: A K-Gram index object
@@ -56,7 +64,7 @@ class DiskPositionalIndex<T: FixedWidthInteger, U: FixedWidthInteger>: IndexProt
     func getElements() -> Set<VocabularyElement> {
         return Set<VocabularyElement>()
     }
-    
+
     /// Release resources used by the index
     func dispose() {
         self.diskIndexUtility.dispose()
