@@ -1,7 +1,10 @@
 FROM python:3.7
 
+ADD requirements.txt /
 ADD repeat_hash.py /
-ADD test-data.html /
+ADD data.txt /
 ADD hash_crypto.py /
 
-CMD [ "python", "/hash_crypto.py", "&&", "python", "./repeat_hash.py"]
+RUN pip install -r requirements.txt
+
+CMD [ "python", "/hash_crypto.py"]
