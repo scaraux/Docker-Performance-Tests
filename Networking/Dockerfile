@@ -1,7 +1,13 @@
-from debian:latest
+FROM node:8
 
-RUN apt-get update
-RUN apt-get -y install python-pip
-RUN pip install speedtest-cli
+WORKDIR /usr/src/app
 
-CMD ["speedtest-cli", "--server", "13654"]
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+EXPOSE 3000
+
+CMD [ "npm", "start" ]
